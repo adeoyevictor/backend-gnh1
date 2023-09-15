@@ -1,32 +1,16 @@
 const express = require("express")
+const { createProxyMiddleware } = require("http-proxy-middleware");
 const app = express()
-const moment = require("moment")
+const cors = require('cors')
+app.use(cors())
 
-app.get('/api', (req, res) => {
-    const slack_name = req.query.slack_name
-    const track = req.query.track
-    
-    if(!slack_name || !track){
-        return res.status(400).json({
-            error: "please provide_slack name and track as GET params"
-        })
-    }
-    const current_day = moment().format("dddd")
-    const utc_now = moment.utc()
-    const utc_time = utc_now.format("YYYY-MM-DDTHH:mm:ss[Z]")
-
-    res.json({
-      slack_name,
-      current_day,
-      utc_time,
-      track,
-      github_file_url:
-        "https://github.com/adeoyevictor/backend-gnh1/blob/main/index.js",
-      github_repo_url:
-        "https://github.com/adeoyevictor/backend-gnh1",
-      status_code: 200,
-    });
-})
+app.use(
+  "/api",
+  createProxyMiddleware({
+    target: "http://3wdz.c.time4vps.cloud:3000",
+    changeOrigin: true,
+  })
+);
 
 const PORT = process.env.PORT || 3001
 
